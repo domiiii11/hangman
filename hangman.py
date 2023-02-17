@@ -34,19 +34,12 @@ def fetch_random_word():
     with open('words.txt') as f:
         lines = f.readlines()
         while True:
-            random_word = random.choice(lines).strip()
+            random_word = random.choice(tuple(lines)).strip()
             if len(set(random_word)) <= 6:
                 return random_word
 
 def create_empty_word(numbers_of_letters):
-    empty_word  = '_'
-    for i in range(1, numbers_of_letters):
-        empty_word  += " _"
-    return empty_word
-
-def collect_used_letters(guessed_letter, used_letters):
-    used_letters += ' ' + guessed_letter
-    return used_letters
+    return ' '.join('_' for _ in range(numbers_of_letters))
 
 def complement_hidden_word(hidden_word, index, letter):
     index = index * 2
@@ -55,11 +48,7 @@ def complement_hidden_word(hidden_word, index, letter):
 
 def check_if_full_word_collected(hidden_word):
     allowed = set(string.ascii_lowercase + ' ')
-    word = set(hidden_word)
-    if word.issubset(allowed):
-        return True
-    else:
-        return False
+    return set(hidden_word).issubset(allowed)
 
 def play_again():
     print("Would You like to play again? Type Y or N.") 
@@ -84,7 +73,7 @@ def play_game():
     number_of_letters = len(random_word)
     hidden_word = create_empty_word(number_of_letters)
     print("Hi, we will play hangman. You will have 6 guesses. Let's start.")
-    used_letters = ''
+    used_letters = []
     for i in range(6):
         print("Guess a letter.")
         guessed_letter = input().lower()
@@ -93,9 +82,9 @@ def play_game():
             guessed_letter = input().lower()
         for index, letter in enumerate(random_word):
             if letter == guessed_letter:
-                used_letters = collect_used_letters(guessed_letter, used_letters) 
+                used_letters.append(guessed_letter)
                 hidden_word = complement_hidden_word(hidden_word, int(index), guessed_letter)
-        print("Used letters: ", used_letters)
+        print("Used letters: ", ' '.join(used_letters))
         print("Word: ", hidden_word)
         if check_if_full_word_collected(hidden_word):
             print("You guessed the word " + random_word + ". Well done!")
